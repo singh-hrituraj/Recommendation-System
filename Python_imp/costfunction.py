@@ -21,7 +21,7 @@ def costfunction(X, Theta, Y, R, numusers, nummovies,numfeatures, reg = 0):
 
     Output = np.dot(X, np.transpose(Theta))
 
-    J = 0.5 * np.sum((Output[R]- Y[R])*(Output[R] - Y[R]))
+    J = 0.5 * np.sum((Output[R]- Y[R])*(Output[R] - Y[R])) + reg * np.sum(Theta *Theta) + reg * np.sum(X * X)
     return J
 
 costfunction(X,Theta, Y, R, numusers, nummovies, numfeatures)
