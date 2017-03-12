@@ -13,11 +13,10 @@ numfeatures = load_data.numfeatures
 def costfunction(X, Theta, Y, R, numusers, nummovies,numfeatures, reg = 0):
 
     X = X[0:nummovies,0:numfeatures]
-    print X
     Y = Y[0:nummovies,0:numusers]
     Theta = Theta[0:numusers, 0:numfeatures]
     R = R[0:nummovies, 0:numusers]
-    print R
+    
 
     Output = np.dot(X, np.transpose(Theta))
 
