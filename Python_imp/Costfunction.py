@@ -1,7 +1,5 @@
 import load_data
 import numpy as np
-from scipy import optimize
-
 X = load_data.X
 Y = load_data.Y
 R = load_data.R
