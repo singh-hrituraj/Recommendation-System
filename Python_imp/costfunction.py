@@ -19,7 +19,8 @@ Theta = Theta[0:numusers,0:numfeatures]
 params = np.concatenate((Theta.reshape(np.prod(Theta.shape), 1), X.reshape(np.prod(X.shape), 1)))
 
 
-def costfunction(Params, Y, R, numusers, nummovies,numfeatures, reg = 0):
+def costfunction(Params, *args):
+    Y, R, numusers, nummovies,numfeatures, reg = args
 
     Theta = np.reshape(params[0:numusers * numfeatures, :], (numusers, numfeatures))
     X = np.reshape(params[numusers*numfeatures: ,:], (nummovies, numfeatures))
@@ -30,7 +31,8 @@ def costfunction(Params, Y, R, numusers, nummovies,numfeatures, reg = 0):
     J = 0.5 * np.sum((Output[R]- Y[R])*(Output[R] - Y[R])) + reg * np.sum(Theta *Theta) + reg * np.sum(X * X)
     return J
 
-def gradientfunc(params, Y, R, numusers, nummovies,numfeatures, reg = 0):
+def gradientfunc(params, *args):
+    Y, R, numusers, nummovies,numfeatures, reg = args
     Theta = np.reshape(params[0:numusers * numfeatures, :], (numusers, numfeatures))
     X = np.reshape(params[numusers * numfeatures:, :], (nummovies, numfeatures))
 
@@ -42,4 +44,5 @@ def gradientfunc(params, Y, R, numusers, nummovies,numfeatures, reg = 0):
     Gradient = np.concatenate((Grad_Theta.reshape(np.prod(Grad_Theta.shape), 1), Grad_X.reshape(np.prod(Grad_X.shape), 1)))
 
     return Gradient
+
 
