@@ -1,46 +1,73 @@
 import load_data
+from scipy.optimize import minimize
+import math
+
 import numpy as np
-X = load_data.X
+
+
 Y = load_data.Y
 R = load_data.R
-Theta = load_data.Theta
+
 numusers = load_data.numusers
 nummovies = load_data.nummovies
 numfeatures = load_data.numfeatures
+reg = 0
 
-X = X[0:nummovies, 0:numfeatures]
-Y = Y[0:nummovies,0:numusers]
-R = R[0:nummovies,0:numusers]
-Theta = Theta[0:numusers,0:numfeatures]
-
-
-params = np.concatenate((Theta.reshape(np.prod(Theta.shape), 1), X.reshape(np.prod(X.shape), 1)))
+Y = Y[:nummovies,:numusers]
+R = R[:nummovies,:numusers]
 
 
-def costfunction(Params, *args):
-    Y, R, numusers, nummovies,numfeatures, reg = args
 
-    Theta = np.reshape(params[0:numusers * numfeatures, :], (numusers, numfeatures))
-    X = np.reshape(params[numusers*numfeatures: ,:], (nummovies, numfeatures))
-    
+X = np.random.randn(nummovies, numfeatures)
+Theta = np.random.randn(numusers, numfeatures)
+initial_parameters = np.concatenate((X.reshape(X.size, order='F'), Theta.reshape(Theta.size, order='F')))
 
-    Output = np.dot(X, np.transpose(Theta))
+def costfunction(params,Y, R, num_users, num_movies, num_features, lambda_var):
 
-    J = 0.5 * np.sum((Output[R]- Y[R])*(Output[R] - Y[R])) + reg * np.sum(Theta *Theta) + reg * np.sum(X * X)
+
+    X = np.reshape(params[:num_movies * num_features], (num_movies, num_features), order='F')
+    Theta = np.reshape(params[num_movies * num_features:], (num_users, num_features), order='F')
+
+
+
+
+
+
+    squared_error = np.power(np.dot(X, Theta.T) - Y, 2)
+    J = (1 / 2.) * np.sum(squared_error * R)
+    J = J + (lambda_var / 2.) * (np.sum(np.power(Theta, 2)) + np.sum(np.power(X, 2)))
+
     return J
 
-def gradientfunc(params, *args):
-    Y, R, numusers, nummovies,numfeatures, reg = args
-    Theta = np.reshape(params[0:numusers * numfeatures, :], (numusers, numfeatures))
-    X = np.reshape(params[numusers * numfeatures:, :], (nummovies, numfeatures))
 
-    Output = np.dot(X, np.transpose(Theta))
+def Junction(initial_parameters):
 
-    Grad_X = np.dot(R * Output - R * Y, Theta) + reg * X
-    Grad_Theta = np.dot(np.transpose(R * Output - R * Y), X) + reg * Theta
+    return costfunction(initial_parameters, Y, R, numusers, nummovies, numfeatures, reg)
 
-    Gradient = np.concatenate((Grad_Theta.reshape(np.prod(Grad_Theta.shape), 1), Grad_X.reshape(np.prod(Grad_X.shape), 1)))
 
-    return Gradient
+maxiter = 1000
+options = {'disp': True, 'maxiter':maxiter}
+
+result = minimize(Junction, x0= initial_parameters, options=options, method="L-BFGS-B", jac=True )
+
+params = result['x']
+X = np.reshape(params[:nummovies * numfeatures], (nummovies, numfeatures), order='F')
+Theta = np.reshape(params[nummovies * numfeatures:], (numusers, numfeatures), order='F')
+output = np.dot(X, Theta.T)
+
+total = 0
+correct = 0
+for i in range(numusers):
+    for j in range(nummovies):
+        if R[j,i] ==1:
+            if math.fabs(Y[j,i] - output[j,i]) < 0.8:
+                correct = correct + 1
+            total = total + 1
+
+
+print "Result is %d / %d"%(correct,total)
+accuracy = 100* (float(correct) / total)
+print  " Accuracy : {0} '%'".format(accuracy)
+
 
 
