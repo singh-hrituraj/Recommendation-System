@@ -1,24 +1,44 @@
-import Costfunction
+import load_data
+import numpy as np
+import normalizeRatings
+import Model_Trainer
+numcourses = load_data.numcourses
+courseslist = load_data.loadcoursesList()
 
 
-params = Costfunction.params
+new_user = np.zeros((load_data.Y.shape[0],1))
 
-Y = Costfunction.Y
-R = Costfunction.R
-numusers = Costfunction.numusers
-nummovies = Costfunction.nummovies
-numfeatures = Costfunction.numfeatures
-reg = 0
+new_user[0] = 5
+new_user[11] = 5
+new_user[63] = 4
+new_user[69] = 3
 
-learning_rate = 0.003
+for i, rating in enumerate(new_user):
+    if rating > 0:
+        print('Rated {:.0f} for {:s}\n'.format(rating[0], courseslist[i]))
 
-iter = 10000
-for i in range(iter):
-    print " iter %d \n " %i
+print new_user.shape
+print load_data.Y.shape
 
-    params = params - learning_rate * Costfunction.gradientfunc(params, Y, R, numusers, nummovies, numfeatures, reg)
+load_data.Y = np.column_stack((new_user, load_data.Y))
+load_data.R = np.column_stack(((new_user != 0).astype(int), load_data.R))
 
-    print Costfunction.costfunction(params, Y, R, numusers, nummovies, numfeatures, reg)
+[load_data.Y, Y_Mean] = normalizeRatings.normalizeRatings(load_data.Y,load_data.R)
+
+
+load_data.numstudents = load_data.Y.shape[1]
+
+
+print "Training our model: \n Please keep patience \n"
+
+output = Model_Trainer.output[:,0] + Y_Mean.flatten()
+
+outputarg = output.argsort()[::-1]
+
+for i in xrange(10):
+    j = outputarg[i]
+    print('Predicting rating {:.5f} for course {:s}'.format(output[j], courseslist[j]))
+
 
 
 
