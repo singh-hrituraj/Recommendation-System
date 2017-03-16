@@ -18,4 +18,15 @@ numfeatures = Parameters['num_features']
 numcourses = Parameters['num_courses']
 
 
+def loadcoursesList():
 
+    with open("movie_ids.txt") as course_file:
+        course_list = []
+
+        for i,course in enumerate(course_file.readlines()):
+            course_name  = course.split()[1:]
+            course_list.append(" ".join(course_name))
+
+    return course_list
+  
+loadcoursesList()
