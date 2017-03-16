@@ -36,8 +36,15 @@ def costfunction(params,Y, R, num_users, num_movies, num_features, lambda_var):
     squared_error = np.power(np.dot(X, Theta.T) - Y, 2)
     J = (1 / 2.) * np.sum(squared_error * R)
     J = J + (lambda_var / 2.) * (np.sum(np.power(Theta, 2)) + np.sum(np.power(X, 2)))
+    X_grad = np.dot((np.dot(X, Theta.T) - Y) * R, Theta)
+    Theta_grad = np.dot(((np.dot(X, Theta.T) - Y) * R).T, X)
 
-    return J
+    X_grad = X_grad + lambda_var * X
+    Theta_grad = Theta_grad + lambda_var * Theta
+
+    grad = np.concatenate((X_grad.reshape(X_grad.size, order='F'), Theta_grad.reshape(Theta_grad.size, order='F')))
+
+    return J, grad
 
 
 def Junction(initial_parameters):
