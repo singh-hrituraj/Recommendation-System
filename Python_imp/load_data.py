@@ -29,4 +29,3 @@ def loadcoursesList():
 
     return course_list
   
-loadcoursesList()
