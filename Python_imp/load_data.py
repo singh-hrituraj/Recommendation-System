@@ -1,8 +1,21 @@
 import scipy.io as sio
-import numpy as np
 
 
 data = sio.loadmat('ex8_movies.mat') #load the movie data set
 
-Y = np.array(data['Y'])
-R = np.array(data['R'], dtype= bool)
+Y = data['Y']
+R = data['R']
+
+
+Parameters = sio.loadmat('ex8_movieParams.mat')
+
+X = Parameters['X']
+
+Theta = Parameters['Theta']
+
+numstudents = Parameters['num_users']
+numfeatures = Parameters['num_features']
+numcourses = Parameters['num_movies']
+
+
+
