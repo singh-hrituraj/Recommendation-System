@@ -20,7 +20,7 @@ numcourses = Parameters['num_courses']
 
 def loadcoursesList():
 
-    with open("movie_ids.txt") as course_file:
+    with open("course_ids.txt") as course_file:
         course_list = []
 
         for i,course in enumerate(course_file.readlines()):
